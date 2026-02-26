@@ -15,9 +15,12 @@ class ProduitType extends AbstractType
         $builder
             ->add('name')
             ->add('description')
-            ->add('isActive')
             ->add('stock')
-            ->add('imageFile', FileType::class)
+            ->add('imagesFiles', FileType::class, [
+                'label' => 'Images',
+                'mapped' => false,
+                'multiple' => true
+            ])
         ;
     }
 

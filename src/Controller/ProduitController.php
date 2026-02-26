@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Image;
 use App\Entity\Produit;
 use App\Form\ProduitType;
 use App\Repository\ProduitRepository;
@@ -30,6 +31,12 @@ final class ProduitController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $files = $form->get('imagesFiles')->getData();
+            foreach ($files as $file) {
+                $image = new Image();
+                $image->setImageFile($file);
+                $produit->addImage($image);
+            }
             $entityManager->persist($produit);
             $entityManager->flush();
 

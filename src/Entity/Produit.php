@@ -3,13 +3,12 @@
 namespace App\Entity;
 
 use App\Repository\ProduitRepository;
-use Vich\UploaderBundle\Mapping\Attribute as Vich;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\HttpFoundation\File\File;
 
 #[ORM\Entity(repositoryClass: ProduitRepository::class)]
-#[Vich\Uploadable]
 class Produit
 {
     #[ORM\Id]
@@ -23,21 +22,22 @@ class Produit
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
-
-    #[ORM\Column()]
-    private ?string $imageName = null;
-
     #[ORM\Column]
     private ?bool $isActive = true;
 
     #[ORM\Column]
     private ?bool $stock = true;
 
-    #[ORM\Column]
-    private ?\DateTimeImmutable $updatedAt = null;
+    /**
+     * @var Collection<int, Image>
+     */
+    #[ORM\OneToMany(targetEntity: Image::class, mappedBy: 'produit', cascade:['persist'] )]
+    private Collection $images;
 
-    #[Vich\UploadableField(mapping: 'produits', fileNameProperty: 'imageName')]
-    private ?File $imageFile = null;
+    public function __construct()
+    {
+        $this->images = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -54,32 +54,6 @@ class Produit
         $this->name = $name;
 
         return $this;
-    }
-
-    public function getImageName(): ?string
-    {
-        return $this->imageName;
-    }
-
-    public function setImageName(string $imageName): static
-    {
-        $this->imageName = $imageName;
-
-        return $this;
-    }
-
-    public function getImageFile(): ?File
-    {
-        return $this->imageFile;
-    }
-
-    public function setImageFile(?File $imageFile = null): void
-    {
-        $this->imageFile = $imageFile;
-
-        if (null !== $imageFile) {
-            $this->updatedAt = new \DateTimeImmutable();
-        }
     }
 
     public function getDescription(): ?string
@@ -118,15 +92,34 @@ class Produit
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    /**
+     * @return Collection<int, Image>
+     */
+    public function getImages(): Collection
     {
-        return $this->updatedAt;
+        return $this->images;
     }
 
-    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
+    public function addImage(Image $image): static
     {
-        $this->updatedAt = $updatedAt;
+        if (!$this->images->contains($image)) {
+            $this->images->add($image);
+            $image->setProduit($this);
+        }
 
         return $this;
     }
+
+    public function removeImage(Image $image): static
+    {
+        if ($this->images->removeElement($image)) {
+            // set the owning side to null (unless already changed)
+            if ($image->getProduit() === $this) {
+                $image->setProduit(null);
+            }
+        }
+
+        return $this;
+    }
+
 }
