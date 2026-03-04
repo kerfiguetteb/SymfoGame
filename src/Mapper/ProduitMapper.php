@@ -28,7 +28,6 @@ class ProduitMapper{
             
         }
 
-
         return new ProduitDto(
             id : $produit->getId(),
             name: $produit->getName(),
