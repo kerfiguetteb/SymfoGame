@@ -2,7 +2,6 @@
 
 namespace App\Controller\Api;
 
-use App\DTO\ProduitDto;
 use App\Entity\Produit;
 use App\Mapper\ProduitMapper;
 use App\Repository\ProduitRepository;

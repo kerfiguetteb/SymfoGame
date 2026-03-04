@@ -18,16 +18,15 @@ class ProduitMapper{
     public function toDto(Produit $produit): ProduitDto
     {
         $imageUrls = [];
-
         foreach ($produit->getImages() as $image) {
-
-        $path = $this->uploaderHelper->asset($image, 'imageFile');
+            if ($image) {
+                # code...
+                $path = $this->uploaderHelper->asset($image, 'imageFile');
+            }
         if ($path) {
            $imageUrls[] = $this->urlHelper->getAbsoluteUrl($path);
         }
-            
         }
-
         return new ProduitDto(
             id : $produit->getId(),
             name: $produit->getName(),
