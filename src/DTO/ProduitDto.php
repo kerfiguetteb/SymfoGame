@@ -2,7 +2,7 @@
 
 namespace App\DTO;
 
-class ProduitDto
+class ProduitDTO
 {
     public function __construct(
         public ?int $id,
@@ -10,6 +10,6 @@ class ProduitDto
         public ?string $description,
         public ?bool $isActive,
         public ?bool $stock,
-        public array $images,
+        public array $images
     ) {}
 }
