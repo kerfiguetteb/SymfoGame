@@ -11,7 +11,6 @@ class ProduitMapper{
     public function __construct(
         private readonly UploaderHelper $uploaderHelper,
         private readonly UrlHelper $urlHelper,
-        
         ) {
     }
 
@@ -19,10 +18,7 @@ class ProduitMapper{
     {
         $imageUrls = [];
         foreach ($produit->getImages() as $image) {
-            if ($image) {
-                # code...
-                $path = $this->uploaderHelper->asset($image, 'imageFile');
-            }
+            $path = $this->uploaderHelper->asset($image, 'imageFile') ;
         if ($path) {
            $imageUrls[] = $this->urlHelper->getAbsoluteUrl($path);
         }

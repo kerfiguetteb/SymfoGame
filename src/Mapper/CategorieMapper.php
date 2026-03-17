@@ -12,11 +12,9 @@ class CategorieMapper
     public function __construct(
         private readonly UploaderHelper $uploaderHelper,
         private readonly UrlHelper $urlHelper,
-
     ) {}
 
-    public function toDto(Categorie $categorie,ProduitMapper $produitMapper
-): CategorieDto
+    public function toDto(Categorie $categorie,ProduitMapper $produitMapper): CategorieDto
     {
         $produits = [];
 
@@ -24,10 +22,13 @@ class CategorieMapper
             $produit = $produitMapper->toDto($item);
             $produits[] = $produit;
         }
-        $path = $this->uploaderHelper->asset($categorie->getImage(), 'imageFile');
-        $imageUrl = '';
-        if ($path) {
-           $imageUrl =  $this->urlHelper->getAbsoluteUrl($path);
+        $image = $categorie->getImage();
+        $imageUrl = null;
+        if ($image) {
+            $path = $this->uploaderHelper->asset($categorie->getImage(), 'imageFile');
+            if ($path) {
+                $imageUrl = $path ? $this->urlHelper->getAbsoluteUrl($path) : '';
+            }
         }
         return new CategorieDto(
             id: $categorie->getId(),
