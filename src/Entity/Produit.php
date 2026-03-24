@@ -34,7 +34,7 @@ class Produit
     #[ORM\OneToMany(targetEntity: Image::class, mappedBy: 'produit', cascade:['persist'] )]
     private Collection $images;
 
-    #[ORM\ManyToOne(inversedBy: 'produit')]
+    #[ORM\ManyToOne(inversedBy: 'produit', cascade:['persist'])]
     #[ORM\JoinColumn(nullable: false)]
     private ?Categorie $categorie = null;
 

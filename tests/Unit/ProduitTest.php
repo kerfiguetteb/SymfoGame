@@ -2,13 +2,11 @@
 
 namespace App\Tests\Unit;
 
-// Import des classes nécessaires pour les tests
 use App\Entity\Image;
 use App\Entity\Produit;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\File;
 
-// Classe de test pour l'entité Produit (et Image)
 class ProduitTest extends TestCase
 {
     /**
