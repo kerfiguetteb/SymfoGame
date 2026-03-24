@@ -34,6 +34,10 @@ class Produit
     #[ORM\OneToMany(targetEntity: Image::class, mappedBy: 'produit', cascade:['persist'] )]
     private Collection $images;
 
+    #[ORM\ManyToOne(inversedBy: 'produit')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Categorie $categorie = null;
+
     public function __construct()
     {
         $this->images = new ArrayCollection();
@@ -118,6 +122,18 @@ class Produit
                 $image->setProduit(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCategorie(): ?Categorie
+    {
+        return $this->categorie;
+    }
+
+    public function setCategorie(?Categorie $categorie): static
+    {
+        $this->categorie = $categorie;
 
         return $this;
     }
