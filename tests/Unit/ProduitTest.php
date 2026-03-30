@@ -1,115 +1,128 @@
 <?php
 
-namespace App\Tests\Unit;
+namespace App\Tests\Unit\Entity;
 
 use App\Entity\Image;
 use App\Entity\Produit;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\File\File;
 
 class ProduitTest extends TestCase
 {
-    /**
-     * Exo 1 : Test du setter et getter du nom du produit
-     */
-    public function testSetName(): void
+    public function testDefaultValues(): void
     {
-        // Arrange : création d’un produit et définition d’un nom
         $produit = new Produit();
-        $nameProduit = 'produit ';
 
-        // Act : on définit le nom
-        $produit->setName($nameProduit);
-
-        // Assert : on vérifie que le nom est bien enregistré
-        self::assertSame($nameProduit, $produit->getName());
+        $this->assertNull($produit->getId());
+        $this->assertNull($produit->getName());
+        $this->assertNull($produit->getDescription());
+        $this->assertTrue($produit->isActive());
+        $this->assertTrue($produit->isStock());
+        $this->assertCount(0, $produit->getImages());
     }
 
-    /**
-     * Exo 2 : Test du champ booléen isActive
-     */
-    public function testIsActive(): void
+    public function testNameCanBeSetAndRead(): void
     {
-        // Création d’un produit
         $produit = new Produit();
+        $produit->setName('Chaussure');
 
-        // On désactive le produit
-        $produit->setIsActive(false);
-
-        // Vérifie que isActive retourne bien false
-        self::assertFalse($produit->isActive());
+        $this->assertSame('Chaussure', $produit->getName());
     }
 
-    /**
-     * Exo 3 : Test que la description peut être null
-     */
-    public function testDescriptionNullable(): void
+    public function testDescriptionCanBeSetAndRead(): void
     {
         $produit = new Produit();
+        $produit->setDescription('Description du produit');
 
-        // On met la description à null
+        $this->assertSame('Description du produit', $produit->getDescription());
+    }
+
+    public function testDescriptionCanBeNull(): void
+    {
+        $produit = new Produit();
         $produit->setDescription(null);
 
-        // Vérifie que la valeur est bien null
-        self::assertNull($produit->getDescription());
+        $this->assertNull($produit->getDescription());
     }
 
-    /**
-     * Exo 4 : Test du nom de fichier de l'image
-     */
-    public function testImageName(): void
+    public function testIsActiveCanBeSetAndRead(): void
     {
-        $image = new Image();
-
-        // Définition du nom de l'image
-        $image->setImageName('photo.jpg');
-
-        // Vérifie que le nom est correctement enregistré
-        self::assertSame('photo.jpg', $image->getImageName());
-    }
-
-    /**
-     * Exo 5 : Test de la relation entre Image et Produit
-     */
-    public function testImageProduitRelation(): void
-    {
-        $image = new Image();
         $produit = new Produit();
+        $produit->setIsActive(false);
 
-        // On associe un produit à l’image
-        $image->setProduit($produit);
-
-        // Vérifie que la relation est bien définie
-        self::assertSame($produit, $image->getProduit());
+        $this->assertFalse($produit->isActive());
     }
 
-    /**
-     * Exo 6 : Test que setImageFile met à jour la date updatedAt
-     */
-    public function testSetImageFileUpdatesDate(): void
+    public function testStockCanBeSetAndRead(): void
     {
+        $produit = new Produit();
+        $produit->setStock(false);
+
+        $this->assertFalse($produit->isStock());
+    }
+
+    public function testAddImageAddsImageToCollection(): void
+    {
+        $produit = new Produit();
         $image = new Image();
 
-        // Création d’un fichier temporaire simulant une image
-        $tmpFile = tempnam(sys_get_temp_dir(), 'img_');
-        file_put_contents($tmpFile, 'fake');
+        $produit->addImage($image);
 
-        // Création d’un objet File Symfony
-        $file = new File($tmpFile);
+        $this->assertCount(1, $produit->getImages());
+        $this->assertTrue($produit->getImages()->contains($image));
+    }
 
-        // Vérifie qu’au départ updatedAt est null
-        self::assertNull($image->getUpdatedAt());
+    public function testAddImageSetsOwningSide(): void
+    {
+        $produit = new Produit();
+        $image = new Image();
 
-        // On assigne un fichier à l’image
-        $image->setImageFile($file);
+        $produit->addImage($image);
 
-        // Vérifie que le fichier est bien enregistré
-        self::assertSame($file, $image->getImageFile());
+        $this->assertSame($produit, $image->getProduit());
+    }
 
-        // Vérifie que la date updatedAt a été mise à jour automatiquement
-        self::assertInstanceOf(\DateTimeImmutable::class, $image->getUpdatedAt());
+    public function testAddSameImageTwiceDoesNotDuplicate(): void
+    {
+        $produit = new Produit();
+        $image = new Image();
 
-        // Suppression du fichier temporaire pour éviter les fichiers inutiles
-        unlink($tmpFile);
+        $produit->addImage($image);
+        $produit->addImage($image);
+
+        $this->assertCount(1, $produit->getImages());
+    }
+
+    public function testRemoveImageRemovesImageFromCollection(): void
+    {
+        $produit = new Produit();
+        $image = new Image();
+
+        $produit->addImage($image);
+        $produit->removeImage($image);
+
+        $this->assertCount(0, $produit->getImages());
+        $this->assertFalse($produit->getImages()->contains($image));
+    }
+
+    public function testRemoveImageUnsetsOwningSide(): void
+    {
+        $produit = new Produit();
+        $image = new Image();
+
+        $produit->addImage($image);
+        $produit->removeImage($image);
+
+        $this->assertNull($image->getProduit());
+    }
+
+    public function testRemoveImageThatDoesNotExistDoesNothing(): void
+    {
+        $produit = new Produit();
+        $image = new Image();
+
+        $produit->removeImage($image);
+
+        $this->assertCount(0, $produit->getImages());
+        $this->assertNull($image->getProduit());
     }
 }
