@@ -52,21 +52,38 @@ final class ProduitControllerTest extends WebTestCase
      * Ici on prend l'utilisateur avec l'ID 1.
      * Idéalement, en projet réel, on utiliserait des fixtures dédiées.
      */
-    private function loginTestUser(): User
-    {
-        $user = $this->entityManager
-            ->getRepository(User::class)
-            ->find(1);
+private function loginTestUser(): User
+{
+    $user = $this->entityManager
+        ->getRepository(User::class)
+        ->findOneBy(['email' => 'test@test.com']);
 
-        // Vérifie qu'un utilisateur existe bien en base de test.
-        self::assertNotNull($user, 'Aucun utilisateur avec l\'ID 1 n\'a été trouvé en base de test.');
+    // Si aucun utilisateur trouvé → on en crée un
+    if (!$user) {
+        $user = new User();
+        $user->setEmail('test@test.com');
 
-        // Connexion de l'utilisateur sur le client HTTP.
-        $this->client->loginUser($user);
+       //encodage du mot de passe
+        $passwordHasher = static::getContainer()
+            ->get('security.password_hasher');
 
-        return $user;
+        $hashedPassword = $passwordHasher->hashPassword($user, 'password');
+
+        $user->setPassword($hashedPassword);
+
+        // Rôle admin pour éviter les soucis d'accès
+        $user->setRoles(['ROLE_ADMIN']);
+
+        // Sauvegarde en base
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
     }
 
+    // Connexion de l'utilisateur
+    $this->client->loginUser($user);
+
+    return $user;
+}
     /**
      * Test : la page de liste des produits est accessible.
      */
