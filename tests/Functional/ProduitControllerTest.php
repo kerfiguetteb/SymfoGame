@@ -92,7 +92,7 @@ private function loginTestUser(): User
         $this->loginTestUser();
 
         // Requête HTTP GET sur la page liste.
-        $this->client->request('GET', '/produit');
+        $this->client->request('GET', '/produits');
 
         // Vérifie que la réponse HTTP est bien un succès (200-299).
         self::assertResponseIsSuccessful();
@@ -106,7 +106,7 @@ private function loginTestUser(): User
         $this->loginTestUser();
 
         // Requête HTTP GET sur la page de création.
-        $this->client->request('GET', '/produit/new');
+        $this->client->request('GET', '/produits/new');
 
         // Vérifie que la page répond correctement.
         self::assertResponseIsSuccessful();
@@ -120,7 +120,7 @@ private function loginTestUser(): User
         $this->loginTestUser();
 
         // Chargement de la page du formulaire.
-        $crawler = $this->client->request('GET', '/produit/new');
+        $crawler = $this->client->request('GET', '/produits/new');
 
         // Vérifie que la page s'affiche correctement.
         self::assertResponseIsSuccessful();

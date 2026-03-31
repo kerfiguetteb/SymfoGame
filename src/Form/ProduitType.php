@@ -30,7 +30,6 @@ class ProduitType extends AbstractType
                 'mapped' => false,
                 'multiple' => true
             ])
-            ->add('categorie', EntityType::class)
 
         ;
     }
