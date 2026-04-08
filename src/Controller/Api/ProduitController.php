@@ -7,25 +7,21 @@ use App\Mapper\ProduitMapper;
 use App\Repository\ProduitRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('api/produits')]
+#[Route('/api/produits')]
 class ProduitController extends AbstractController
 {
-    #[Route('', name: 'liste_produit', methods:['GET'])]
-    public function index(ProduitRepository $pr, ProduitMapper $produitMapper): JsonResponse
+
+    #[Route('', name: 'list_produit', methods: ['GET'])]
+    public function index(ProduitMapper $mapper, ProduitRepository $pr): JsonResponse
     {
         $produits = $pr->findAllWithImages();
         $data = array_map(
-            fn(Produit $produit) => $produitMapper->toDto($produit), $produits
+            fn(Produit $item) => $mapper->toDto($item),
+            $produits
         );
-        return $this->json($data);
-    }
-
-    #[Route('/{id}', name: 'produit', methods:['GET'])]
-    public function show(Produit $produit, ProduitMapper $produitMapper): JsonResponse
-    {
-        $data =  $produitMapper->toDto($produit);
-        return $this->json($data);
+        return $this->json($data, Response::HTTP_OK);
     }
 }
