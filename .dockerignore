@@ -1,7 +1,0 @@
-var/cache
-var/log
-vendor
-node_modules
-.git
-.idea
-.env.local.php
